@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -58,9 +58,10 @@ namespace EqSolve
                 || f_a == 0 || f_b == 0;
         }
 
-        public double? Solve(Interval range, int N)
+        public double? Solve(Interval range, double epsilon)
         {
             var workingRange = range;
+            var counter = 0;
 
             Interval Divide2(Interval _range)
             {
@@ -74,12 +75,18 @@ namespace EqSolve
                     return range2;
             }
 
+            double error() => Math.Abs(f(workingRange.MidPoint()));
+
             if (!f_has_a_zero_in(workingRange))
                 return null;
 
-            for (int i = 1; i <= N; i++)
+            while (error() > epsilon)
+            {
                 workingRange = Divide2(workingRange);
+                counter++;
+            }
 
+            Console.WriteLine($"Trong khoảng [{range.Begin},{range.End}], epsilon = {epsilon} , số lần lặp {counter}");
             return workingRange.MidPoint();
         }
     }
@@ -100,12 +107,10 @@ namespace EqSolve
 
             Console.WriteLine("Đa thức p(x) = x^2 + 5x + 6");
 
-            // 100 lần lặp 
-            const int repeat = 100;
+            const double epsilon = 0;
 
-            // tìm nghiệm trong khoảng [-2.5,-1.5] với 100 lần lặp
-            var zero1 = p.Solve(new Interval(-2.5, -1.5), repeat);
-            var zero2 = p.Solve(new Interval(-2.5, -3.5), repeat);
+            var zero1 = p.Solve(new Interval(-2.5, 0), epsilon);
+            var zero2 = p.Solve(new Interval(-2.5, -4), epsilon);
 
             zero1.Print();
             zero2.Print();
